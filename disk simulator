@@ -1,0 +1,170 @@
+#include<iostream>
+#include<algorithm>
+#include<vector>
+#include<cmath>
+using namespace std;
+
+vector<int> requests;
+int head, numRequests;
+
+void inputRequests() {
+    cout << "Enter the number of disk requests: ";
+    cin >> numRequests;
+    requests.resize(numRequests);
+    cout << "Enter the disk request sequence: ";
+    for (int i = 0; i < numRequests; i++)
+        cin >> requests[i];
+    cout << "Enter the initial head position: ";
+    cin >> head;
+}
+
+void fcfs() {
+    int totalMovement = 0, currentPos = head;
+    cout << "\nFCFS Order of Request Processing: ";
+    for (int i = 0; i < numRequests; i++) {
+        cout << currentPos << " -> ";
+        totalMovement += abs(requests[i] - currentPos);
+        currentPos = requests[i];
+    }
+    cout << requests[numRequests - 1] << "\nTotal Head Movement: " << totalMovement << " cylinders\n";
+}
+
+void sstf() {
+    vector<int> temp = requests;
+    int totalMovement = 0, currentPos = head;
+    cout << "\nSSTF Order of Request Processing: ";
+    while (!temp.empty()) {
+        auto it = min_element(temp.begin(), temp.end(), [&](int a, int b) {
+            return abs(a - currentPos) < abs(b - currentPos);
+        });
+        cout << currentPos << " -> ";
+        totalMovement += abs(*it - currentPos);
+        currentPos = *it;
+        temp.erase(it);
+    }
+    cout << currentPos << "\nTotal Head Movement: " << totalMovement << " cylinders\n";
+}
+
+void scan(bool direction) {
+    vector<int> temp = requests;
+    temp.push_back(head);
+    temp.push_back(0);
+    sort(temp.begin(), temp.end());
+    int pos = find(temp.begin(), temp.end(), head) - temp.begin();
+    int totalMovement = 0, currentPos = head;
+    cout << "\nSCAN Order of Request Processing: ";
+    if (direction) {
+        for (int i = pos; i < temp.size(); i++) {
+            cout << currentPos << " -> ";
+            totalMovement += abs(temp[i] - currentPos);
+            currentPos = temp[i];
+        }
+        for (int i = pos - 1; i >= 0; i--) {
+            cout << currentPos << " -> ";
+            totalMovement += abs(temp[i] - currentPos);
+            currentPos = temp[i];
+        }
+    } else {
+        for (int i = pos; i >= 0; i--) {
+            cout << currentPos << " -> ";
+            totalMovement += abs(temp[i] - currentPos);
+            currentPos = temp[i];
+        }
+        for (int i = pos + 1; i < temp.size(); i++) {
+            cout << currentPos << " -> ";
+            totalMovement += abs(temp[i] - currentPos);
+            currentPos = temp[i];
+        }
+    }
+    cout << currentPos << "\nTotal Head Movement: " << totalMovement << " cylinders\n";
+}
+
+void cscan() {
+    vector<int> temp = requests;
+    temp.push_back(head);
+    temp.push_back(0);
+    temp.push_back(199); // Assuming disk size of 200 cylinders
+    sort(temp.begin(), temp.end());
+    int pos = find(temp.begin(), temp.end(), head) - temp.begin();
+    int totalMovement = 0, currentPos = head;
+    cout << "\nC-SCAN Order of Request Processing: ";
+    for (int i = pos; i < temp.size(); i++) {
+        cout << currentPos << " -> ";
+        totalMovement += abs(temp[i] - currentPos);
+        currentPos = temp[i];
+    }
+    for (int i = 0; i < pos; i++) {
+        cout << currentPos << " -> ";
+        totalMovement += abs(temp[i] - currentPos);
+        currentPos = temp[i];
+    }
+    cout << currentPos << "\nTotal Head Movement: " << totalMovement << " cylinders\n";
+}
+
+void look(bool direction) {
+    vector<int> temp = requests;
+    temp.push_back(head);
+    sort(temp.begin(), temp.end());
+    int pos = find(temp.begin(), temp.end(), head) - temp.begin();
+    int totalMovement = 0, currentPos = head;
+    cout << "\nLOOK Order of Request Processing: ";
+    if (direction) {
+        for (int i = pos; i < temp.size(); i++) {
+            cout << currentPos << " -> ";
+            totalMovement += abs(temp[i] - currentPos);
+            currentPos = temp[i];
+        }
+        for (int i = pos - 1; i >= 0; i--) {
+            cout << currentPos << " -> ";
+            totalMovement += abs(temp[i] - currentPos);
+            currentPos = temp[i];
+        }
+    } else {
+        for (int i = pos; i >= 0; i--) {
+            cout << currentPos << " -> ";
+            totalMovement += abs(temp[i] - currentPos);
+            currentPos = temp[i];
+        }
+        for (int i = pos + 1; i < temp.size(); i++) {
+            cout << currentPos << " -> ";
+            totalMovement += abs(temp[i] - currentPos);
+            currentPos = temp[i];
+        }
+    }
+    cout << currentPos << "\nTotal Head Movement: " << totalMovement << " cylinders\n";
+}
+
+int main() {
+    inputRequests();
+    int choice;
+    do {
+        cout << "\nSelect Disk Scheduling Algorithm:\n";
+        cout << "1. FCFS\n2. SSTF\n3. SCAN\n4. C-SCAN\n5. LOOK\n6. Exit\n";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            fcfs();
+            break;
+        case 2:
+            sstf();
+            break;
+        case 3:
+            scan(true);
+            break;
+        case 4:
+            cscan();
+            break;
+        case 5:
+            look(true);
+            break;
+        case 6:
+            cout << "Exiting...\n";
+            break;
+        default:
+            cout << "Invalid choice! Try again.\n";
+        }
+    } while (choice != 6);
+
+    return 0;
+}
